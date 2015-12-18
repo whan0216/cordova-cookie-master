@@ -1,5 +1,13 @@
 var cookieMaster = {
 
+    getAllCookies: function (url, successCallback, errorCallback) {
+        cordova.exec(successCallback,
+          errorCallback,
+          'CookieMaster', 'getAllCookies',
+          [url]
+        );
+    },
+
     getCookieValue: function(url, cookieName, successCallback, errorCallback) {
         cordova.exec(successCallback,
                     errorCallback,
