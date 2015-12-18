@@ -40,6 +40,7 @@ public class CookieMaster extends CordovaPlugin {
                         for (int i = 0; i < cookies.length; i++) {
                             jsonStr =jsonStr+(i==0?"":",")+ cookies[i].replace("=", ":");
                         }
+                        jsonStr=jsonStr+"}";
 
                        JSONObject json = null;
                         if (jsonStr != "") {
