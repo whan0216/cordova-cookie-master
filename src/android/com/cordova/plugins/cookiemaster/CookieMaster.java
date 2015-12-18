@@ -19,13 +19,47 @@ public class CookieMaster extends CordovaPlugin {
 
     private final String TAG = "CookieMasterPlugin";
     public static final String ACTION_GET_COOKIE_VALUE = "getCookieValue";
+    public static final String ACTION_GET_ALL_COOKIES = "getAllCookies";
     public static final String ACTION_SET_COOKIE_VALUE = "setCookieValue";
     public static final String ACTION_CLEAR_COOKIES = "clearCookies";
 
     @Override
     public boolean execute(String action, JSONArray args, final CallbackContext callbackContext) throws JSONException {
 
-        if (ACTION_GET_COOKIE_VALUE.equals(action)) {
+        if (ACTION_GET_ALL_COOKIES.equals(action)) {
+                    final String url = args.getString(0);
+
+            cordova.getThreadPool().execute(new Runnable() {
+                public void run() {
+                    try {
+                        CookieManager cookieManager = CookieManager.getInstance();
+                        String[] cookies = cookieManager.getCookie(url).split("; ");
+                        String cookieValue = "";
+
+                        String jsonStr="{";
+                        for (int i = 0; i < cookies.length; i++) {
+                            jsonStr =jsonStr+(i==0?"":",")+ cookies[i].replace("=", ":");
+                        }
+
+                       JSONObject json = null;
+                        if (jsonStr != "") {
+                            json = new JSONObject(jsonStr);
+                        }
+                        if (json != null) {
+                            PluginResult res = new PluginResult(PluginResult.Status.OK, json);
+                            callbackContext.sendPluginResult(res);
+                        } else {
+                            callbackContext.error("Cookie not found!");
+                        }
+                    } catch (Exception e) {
+                        Log.e(TAG, "Exception: " + e.getMessage());
+                        callbackContext.error(e.getMessage());
+                   }
+                }
+            });
+            return true;
+
+        } else if (ACTION_GET_COOKIE_VALUE.equals(action)) {
             final String url = args.getString(0);
             final String cookieName = args.getString(1);
 
